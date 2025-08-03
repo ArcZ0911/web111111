@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Multi Downloader</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0e0e0e;
+      font-family: 'Segoe UI', sans-serif;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
+    }
+    .container {
+      width: 90%;
+      max-width: 500px;
+      padding: 30px;
+      background: #1b1b1b;
+      border-radius: 16px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+      animation: fadeIn 1s ease;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 24px;
+    }
+    input, select, button {
+      width: 100%;
+      padding: 14px;
+      margin: 10px 0;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+    }
+    input, select {
+      background: #333;
+      color: white;
+    }
+    button {
+      background: #00cc66;
+      color: white;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background: #00a653;
+    }
+    .result {
+      margin-top: 20px;
+      text-align: center;
+    }
+    @keyframes fadeIn {
+      from {opacity: 0; transform: translateY(20px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Multi Downloader</h1>
+    <input type="text" id="url" placeholder="Masukkan URL video">
+    <select id="type">
+      <option value="ytmp3">YouTube MP3</option>
+      <option value="ytmp4">YouTube MP4</option>
+      <option value="short">YouTube Shorts</option>
+      <option value="tiktok">TikTok</option>
+      <option value="instagram">Instagram</option>
+    </select>
+    <button onclick="downloadNow()">Download Sekarang</button>
+    <div class="result" id="result"></div>
+  </div>
+
+  <script>
+    async function mockDownloader(type, url) {
+      // Simulasi parsing URL untuk keperluan demo tanpa API eksternal
+      const fakeData = {
+        ytmp3: "https://example.com/audio.mp3",
+        ytmp4: "https://example.com/video.mp4",
+        short: "https://example.com/short.mp4",
+        tiktok: "https://example.com/tiktok.mp4",
+        instagram: "https://example.com/insta.mp4"
+      };
+
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          resolve({ url: fakeData[type] });
+        }, 1000);
+      });
+    }
+
+    async function downloadNow() {
+      const url = document.getElementById("url").value;
+      const type = document.getElementById("type").value;
+      const result = document.getElementById("result");
+
+      if (!url) {
+        result.innerHTML = "<span style='color: red;'>URL tidak boleh kosong</span>";
+        return;
+      }
+
+      result.innerHTML = "⏳ Memproses...";
+
+      try {
+        const data = await mockDownloader(type, url);
+
+        if (data && data.url) {
+          window.open(data.url, '_blank');
+          result.innerHTML = `<span style='color: lightgreen;'>Download siap. Jika tidak otomatis, klik <a href='${data.url}' target='_blank' style='color:cyan;'>di sini</a></span>`;
+        } else {
+          result.innerHTML = "<span style='color: orange;'>Gagal mendapatkan link download</span>";
+        }
+      } catch (err) {
+        result.innerHTML = "<span style='color: red;'>Terjadi kesalahan saat memproses</span>";
+      }
+    }
+  </script>
+</body>
+</html>
