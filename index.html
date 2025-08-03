@@ -78,7 +78,6 @@
 
   <script>
     async function mockDownloader(type, url) {
-      // Simulasi parsing URL untuk keperluan demo tanpa API eksternal
       const fakeData = {
         ytmp3: "https://example.com/audio.mp3",
         ytmp4: "https://example.com/video.mp4",
@@ -110,8 +109,13 @@
         const data = await mockDownloader(type, url);
 
         if (data && data.url) {
-          window.open(data.url, '_blank');
-          result.innerHTML = `<span style='color: lightgreen;'>Download siap. Jika tidak otomatis, klik <a href='${data.url}' target='_blank' style='color:cyan;'>di sini</a></span>`;
+          const a = document.createElement('a');
+          a.href = data.url;
+          a.download = "download";
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          result.innerHTML = `<span style='color: lightgreen;'>Download dimulai.</span>`;
         } else {
           result.innerHTML = "<span style='color: orange;'>Gagal mendapatkan link download</span>";
         }
