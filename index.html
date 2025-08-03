@@ -77,20 +77,34 @@
   </div>
 
   <script>
-    async function mockDownloader(type, url) {
-      const fakeData = {
-        ytmp3: "https://example.com/audio.mp3",
-        ytmp4: "https://example.com/video.mp4",
-        short: "https://example.com/short.mp4",
-        tiktok: "https://example.com/tiktok.mp4",
-        instagram: "https://example.com/insta.mp4"
+    const API_KEY = "mg-esy41h2MenAghpPFnybkFEcnRlI2Bdb0";
+
+    async function fetchRealDownloadURL(type, videoUrl) {
+      const endpoints = {
+        ytmp3: "https://api.maelyn.sbs/api/ytmp3",
+        ytmp4: "https://api.maelyn.sbs/api/youtube/video",
+        short: "https://api.maelyn.sbs/api/ytshort",
+        tiktok: "https://api.maelyn.sbs/api/tiktok",
+        instagram: "https://api.maelyn.sbs/api/instagram"
       };
 
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve({ url: fakeData[type] });
-        }, 1000);
+      const endpoint = endpoints[type];
+      if (!endpoint) throw new Error("Tipe tidak valid");
+
+      const response = await fetch(`${endpoint}?url=${encodeURIComponent(videoUrl)}`, {
+        method: "GET",
+        headers: {
+          "mg-apikey": API_KEY
+        }
       });
+
+      const result = await response.json();
+
+      if (result.status && result.result && result.result.url) {
+        return result.result.url;
+      } else {
+        throw new Error("Gagal mengambil URL unduhan");
+      }
     }
 
     async function downloadNow() {
@@ -106,21 +120,17 @@
       result.innerHTML = "⏳ Memproses...";
 
       try {
-        const data = await mockDownloader(type, url);
-
-        if (data && data.url) {
-          const a = document.createElement('a');
-          a.href = data.url;
-          a.download = "download";
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          result.innerHTML = `<span style='color: lightgreen;'>Download dimulai.</span>`;
-        } else {
-          result.innerHTML = "<span style='color: orange;'>Gagal mendapatkan link download</span>";
-        }
+        const downloadUrl = await fetchRealDownloadURL(type, url);
+        const a = document.createElement('a');
+        a.href = downloadUrl;
+        a.download = '';
+        a.style.display = 'none';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        result.innerHTML = `<span style='color: lightgreen;'>Download dimulai.</span>`;
       } catch (err) {
-        result.innerHTML = "<span style='color: red;'>Terjadi kesalahan saat memproses</span>";
+        result.innerHTML = `<span style='color: red;'>${err.message}</span>`;
       }
     }
   </script>
